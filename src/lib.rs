@@ -1,15 +1,31 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
-use near_sdk::near_bindgen;
+use near_sdk::{env, near_bindgen};
+
+const PUZZLE_NUMBER: u8 = 1;
 
 #[near_bindgen]
 #[derive(Default, BorshDeserialize, BorshSerialize)]
 pub struct Contract {
-    // SETUP CONTRACT STATE
+    crossword_solution: String,
 }
 
 #[near_bindgen]
 impl Contract {
-    // ADD CONTRACT METHODS HERE
+    pub fn get_puzzle_number(&self) -> u8 {
+        PUZZLE_NUMBER
+    }
+
+    pub fn set_solution(&mut self, solution: String) {
+        self.crossword_solution = solution;
+    }
+
+    pub fn guess_solution(&mut self, solution: String) {
+        if solution == self.crossword_solution {
+            env::log_str("You guessed right!")
+        } else {
+            env::log_str("You guessed wrong. Try again!")
+        }
+    }
 }
 
 /*
@@ -35,4 +51,15 @@ mod tests {
     }
 
     // TESTS HERE
+    #[test]
+    fn debug_get_hash() {
+        // Basic set up for a unit test
+        testing_env!(VMContextBuilder::new().build());
+
+        // Using a unit test to rapidly debug and iterate
+        let debug_solution = "near nomicon ref finance";
+        let debug_hash_bytes = env::sha256(debug_solution.as_bytes());
+        let debug_hash_string = hex::encode(debug_hash_bytes);
+        println!("Let's debug: {:?}", debug_hash_string);
+    }
 }
